@@ -28,6 +28,8 @@ Run ```npm install``` in the root project directory to set up the required Node 
 
 Run ```node index.js``` and respond to the prompts. The team page will be saved in ```output/team.html```.
 
+Check out my [demo video](https://drive.google.com/file/d/1i1owzuPLo5sncqS1MVk7-3oUMEOajVam/view)!
+
 
 
 ## Contributing
