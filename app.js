@@ -7,7 +7,6 @@ const path = require("path");
 const fs = require("fs");
 const { promisify } = require("util");
 const writePromise = promisify(fs.writeFile);
-const accessPromise = promisify(fs.access);
 const mkdirPromise = promisify(fs.mkdir);
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
