@@ -4,7 +4,7 @@
 
 ## Description
 
-This is an interactive command line application that takes in information about a project team and then generates an HTML page to display that information. It is written in JavaScript and can be run using Nodejs.
+This is an interactive command line application that takes in information about a project team and then generates a responsive HTML page to display that information. It is written in JavaScript and can be run using Nodejs.
 
 
 
