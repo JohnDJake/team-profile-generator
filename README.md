@@ -34,7 +34,7 @@ Run ```node index.js``` and respond to the prompts. The team page will be saved 
 
 Feel free to fork/pull.
 
-If you'd like to add other types of employees, they must extend the ```Employee``` class and be written in the same format as the existing employee classes. Make sure you also update the ```employeeRole``` ```switch``` statements with new ```case```s for the new employees.
+If you'd like to add other types of employees, they must extend the ```Employee``` class and be written in the same format as the existing employee classes. Make sure you also update the ```employeeRole``` ```switch``` statements in ```app.js``` with new ```case```s for the new employees.
 
 If you have any other changes you'd like to suggest, I'm happy to take a look at the pull request.
 
