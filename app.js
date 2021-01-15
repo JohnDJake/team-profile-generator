@@ -9,6 +9,9 @@ const { promisify } = require("util");
 const writePromise = promisify(fs.writeFile);
 const mkdirPromise = promisify(fs.mkdir);
 
+const emailRegex = new RegExp(/^\S+@[^@\s]+\.[^@\s]+$/);
+const githubRegex = new RegExp(/^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i);
+
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
@@ -47,33 +50,43 @@ async function promptUser() {
     const { managerName, managerId, managerEmail, officeNumber, teamCount } = await inquirer.prompt([{
         type: "input",
         name: "managerName",
-        message: "What is the team manager's name?"
+        message: "What is the team manager's name?",
+        validate: input => input === "" ? "Please enter a name" : true
     }, {
         type: "number",
         name: "managerId",
-        message: ({ managerName }) => `What is ${managerName}'s employee ID?`
+        message: ({ managerName }) => `What is ${managerName}'s employee ID?`,
+        filter: input => isNaN(input) ? "" : input,
+        validate: input => input === "" || isNaN(input) ? "Please enter an ID number" : true
     }, {
         type: "input",
         name: "managerEmail",
-        message: ({ managerName }) => `What is ${managerName}'s email address?`
+        message: ({ managerName }) => `What is ${managerName}'s email address?`,
+        filter: input => input.trim(),
+        validate: input => emailRegex.test(input) ? true : "Please enter a valid email"
     }, {
         type: "number",
         name: "officeNumber",
-        message: ({ managerName }) => `What is ${managerName}'s team's office number?`
+        message: ({ managerName }) => `What is ${managerName}'s team's office number?`,
+        filter: input => isNaN(input) ? "" : input,
+        validate: input => input === "" || isNaN(input) ? "Please enter an office number" : true
     }, {
         type: "number",
         name: "teamCount",
-        message: ({ managerName }) => `How many employees are on ${managerName}'s team?`
+        message: ({ managerName }) => `How many employees are on ${managerName}'s team?`,
+        filter: input => isNaN(input) ? "" : input,
+        validate: input => input === "" || isNaN(input) || input < 0 ? "Please enter a number" : true
     }]);
     teamMembers.push(new Manager(managerName, managerId, managerEmail, officeNumber));
 
     // ask about the other employees
     for (let i = 0; i < teamCount; i++) {
         // ask about the next employee
-        const { employeeName, employeeRole, employeeId, employeeEmail, employeeOther } = await inquirer.prompt([{
+        const { employeeName, employeeRole, employeeId, employeeEmail, employeeGithub, employeeSchool } = await inquirer.prompt([{
             type: "input",
             name: "employeeName",
-            message: "What is the next employee's name?"
+            message: "What is the next employee's name?",
+            validate: input => input === "" ? "Please enter a name" : true
         }, {
             type: "list",
             name: "employeeRole",
@@ -82,22 +95,27 @@ async function promptUser() {
         }, {
             type: "number",
             name: "employeeId",
-            message: ({ employeeName }) => `What is ${employeeName}'s employee ID?`
+            message: ({ employeeName }) => `What is ${employeeName}'s employee ID?`,
+            filter: input => isNaN(input) ? "" : input,
+            validate: input => input === "" || isNaN(input) ? "Please enter an ID number" : true
         }, {
             type: "input",
             name: "employeeEmail",
-            message: ({ employeeName }) => `What is ${employeeName}'s email address?`
+            message: ({ employeeName }) => `What is ${employeeName}'s email address?`,
+            filter: input => input.trim(),
+            validate: input => emailRegex.test(input) ? true : "Please enter a valid email"
         }, {
             type: "input",
-            name: "employeeOther",
-            message: ({ employeeName, employeeRole }) => {
-                switch (employeeRole) {
-                    case "Engineer":
-                        return `What is ${employeeName}'s GitHub username?`;
-                    case "Intern":
-                        return `Where does ${employeeName} go to school?`;
-                }
-            }
+            name: "employeeGithub",
+            message: ({ employeeName }) => `What is ${employeeName}'s GitHub username?`,
+            validate: input => githubRegex.test(input) ? true : "Please enter a valid GitHub username",
+            when: ({ employeeRole }) => employeeRole === "Engineer"
+        }, {
+            type: "input",
+            name: "employeeSchool",
+            message: ({ employeeName }) => `Where does ${employeeName} go to school?`,
+            validate: input => input === "" ? "Please enter a school name" : true,
+            when: ({ employeeRole }) => employeeRole === "Intern"
         }]);
 
         // set Role to the appropriate class
@@ -112,7 +130,7 @@ async function promptUser() {
         }
 
         // add this employee to the array
-        teamMembers.push(new Role(employeeName, employeeId, employeeEmail, employeeOther));
+        teamMembers.push(new Role(employeeName, employeeId, employeeEmail, employeeGithub || employeeSchool));
     }
 
     return teamMembers;
